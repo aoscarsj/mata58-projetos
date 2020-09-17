@@ -21,7 +21,7 @@ int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
 
 //arquivoDestino é o arquivo q sera criado e receberá a copia
 //arquivoOrigem é o arquivo q ja existe e vai ser copiado
-//buffer é o array de char  onde sera armazenado o conteudo lido 
+//buffer é o array de char onde sera armazenado o conteudo lido
 //leituraArquivo é o resultado da operacao de leitura
 //capturaErro é pra capturar os possiveis erros, mas n ta muito bom ainda
 //aux é pra captura do numero de bytes
@@ -30,13 +30,13 @@ int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
 
 int fileCopy(const char *original, const char *copia){
     int arquivoDestino, arquivoOrigem;
-    char buffer[4]; // transferir somente 4kb, seguindo a exigencia da implementação
+    char buffer[4096]; // transferir somente 4kb, seguindo a exigencia da implementação
     int capturaErro;
     int leituraArquivo;
     int aux=0;
 
     //original é o nome do arquivo que ja existe e vai ser copiado
-    //segundo parametro é a permissao do mesmo, no caso é somente para leitura: O_RDONLY == read only 
+    //segundo parametro é a permissao do mesmo, no caso é somente para leitura: O_RDONLY == read only
     //se retornar -1 é pq aconteceu algum erro
 
     if((arquivoOrigem = open(original, O_RDONLY)) == -1){
@@ -46,14 +46,14 @@ int fileCopy(const char *original, const char *copia){
 
 
     //copia é o nome do arquivo q sera criado
-    //segundo parametro é a permissao do mesmo, no caso: 
+    //segundo parametro é a permissao do mesmo, no caso:
             //O_WRONLY == write only == somente escrita
-            //O_CREAT == criar o arquivo se n existir                
+            //O_CREAT == criar o arquivo se n existir
             //O_EXCL == previne a criação se ja existir
     //se retornar o -1 é pq aconteceu algum erro
 
     /*o numero 0660 representa a permissao do arquivo em hexadecimal, no caso:
-      0660 significa que usuarios do mesmo grupo do criador do arquivo pode ler e escrever(read and write) e 
+      0660 significa que usuarios do mesmo grupo do criador do arquivo pode ler e escrever(read and write) e
       tb qualquer outro tipo de usuario tb pode ler e escrever (read and write)
         ----rw-rw-
     */
@@ -66,9 +66,9 @@ int fileCopy(const char *original, const char *copia){
         printf("Erro 2\n");
         erro(capturaErro, arquivoOrigem, arquivoDestino);
     }
-    
 
-    /* leituraArquivo vai receber o arquivo de origem, o array de char (buffer) onde sera armazenado o conteudo lido 
+
+    /* leituraArquivo vai receber o arquivo de origem, o array de char (buffer) onde sera armazenado o conteudo lido
        e o numero de bytes do buffer. Ja a outra condicao do while é para parar assim q terminar de ler o arquivo todo
     */
 
@@ -86,7 +86,7 @@ int fileCopy(const char *original, const char *copia){
     while (leituraArquivo = read(arquivoOrigem, buffer, sizeof buffer), leituraArquivo > 0){
         char *ponteiroEscrita = buffer;
         int escritaArquivo;
-        
+
             escritaArquivo = write(arquivoDestino, ponteiroEscrita, leituraArquivo);
 
             if (escritaArquivo >= 0){
@@ -94,7 +94,7 @@ int fileCopy(const char *original, const char *copia){
                 ponteiroEscrita += escritaArquivo;
                 aux += escritaArquivo;
                 //printf("%d\n ", aux); caso queira ver se o arquivo esta sendo enviado de 4 em 4kb
-                
+
             }
 
             //System calls that are interrupted by signals can either abort and return EINTR
@@ -103,7 +103,7 @@ int fileCopy(const char *original, const char *copia){
                 printf("Erro 3\n");
                 erro(capturaErro, arquivoOrigem, arquivoDestino);
             }
-        
+
     }
 
     printf("%d\n ", aux);//  quantidade de nbytes
