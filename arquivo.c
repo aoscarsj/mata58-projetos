@@ -4,13 +4,15 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#define ENOTENOUGHARGS 0
+#define ENOTENOUGHARGS 256
 
 //fechar arquivos, com prevencao de erros generica
 
-int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
+int erro(int arquivoOrigem, int arquivoDestino,
+         char const * nomeArquivoOrigem, char const * nomeArquivoDestino){
     //site com os tipos de erro -> https://www.thegeekstuff.com/2010/10/linux-error-codes/
-    // ENOTENOUGHARGS foi definido como erro 0, e significa que não foi passado
+
+    // ENOTENOUGHARGS foi definido como erro 256, e significa que não foi passado
     // o número correto de argumentos para o programa
 
     /*
@@ -31,28 +33,27 @@ int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
     #define ENFILE          23      / File table overflow /
     #define EMFILE          24      / Too many open files /
     #define ENOSPC          28      / No space left on device /
-
-    #define EINVAL          22      / Invalid argument /
-    #define EWOULDBLOCK     EAGAIN  / Operation would block /
-    #define EFAULT          14      / Bad address /
-    #define ENOSTR          60      / Device not a stream /
-    #define EBADFD          77      / File descriptor in bad state /
-    #define ERESTART        85      / Interrupted system call should be restarted /
-    #define EAGAIN          11      / Try again /
     */
-
-    if(tipoDeErro == EPERM){
-        printf("Operação não permitida\n");
-    }
-    else if(tipoDeErro == ENOENT){
-        printf("Arquivo ou diretório não existe.\n");
-    }else if(tipoDeErro == EINTR){
-        printf("Chamada de sistema interrompida.\n");
-    }else if(tipoDeErro == ENOTENOUGHARGS){
-        printf("Erro: o programa foi invocado incorretamente. ");
-        printf("O programa deve ser invocado da seguinte forma:\n\n");
-        printf("filecopy ArquivoOrigem ArquivoDestino\n\n");
-        printf("Nenhum arquivo foi copiado e o programa será encerrado agora.\n");
+    switch (errno) {
+        case ENOTENOUGHARGS:
+            perror("Um erro ocorreu");
+            printf("Erro: o programa foi invocado incorretamente. ");
+            printf("O programa deve ser invocado da seguinte forma:\n\n");
+            printf("filecopy ArquivoOrigem ArquivoDestino\n\n");
+            printf("Nenhum arquivo foi copiado e o programa será encerrado.\n");
+            break;
+        case EPERM:
+            printf("Operação não permitida\n");
+            break;
+        case ENOENT:
+            printf("Arquivo ou diretório não existe.\n");
+            break;
+        case EINTR:
+            printf("Chamada de sistema interrompida.\n");
+            break;
+        default:
+            perror("Um erro ocorreu");
+            break;
     }
 
     if (arquivoOrigem >= 0) {
@@ -87,7 +88,7 @@ int fileCopy(const char *original, const char *copia){
 
     if((arquivoOrigem = open(original, O_RDONLY)) == -1){
         printf("Não foi possível abrir o arquivo %s: Arquivo ou diretório não existe.\n", original);
-        return erro(ENOENT,arquivoOrigem,arquivoDestino);
+        return erro(arquivoOrigem,arquivoDestino,original,copia);
     }
 
 
@@ -111,7 +112,7 @@ int fileCopy(const char *original, const char *copia){
     if((arquivoDestino = open(copia, O_WRONLY | O_CREAT | O_EXCL, 0660)) == -1){
         printf("Não foi possível copiar o arquivo %s para o arquivo %s, pois o arquivo %s já existe.\n", original,copia,copia);// se o arquivo existir
 
-        return erro(errno,arquivoOrigem, arquivoDestino);
+        return erro(arquivoOrigem, arquivoDestino,original,copia);
 
     }
 
@@ -149,7 +150,7 @@ int fileCopy(const char *original, const char *copia){
             //chamadas de sistema q sao interrompidas podem ser abortadas e retornar EINTR
             else if (errno != EINTR){
                 printf("Não foi possível executar a escrita no arquivo %s\n", copia);
-                return erro(errno,arquivoOrigem, arquivoDestino);
+                return erro(arquivoOrigem, arquivoDestino,original,copia);
 
             }
 
@@ -161,7 +162,7 @@ int fileCopy(const char *original, const char *copia){
     if (leituraArquivo == 0){
         if (close(arquivoDestino) < 0){
             arquivoDestino = -1;
-            return erro(errno,arquivoOrigem, arquivoDestino);
+            return erro(arquivoOrigem, arquivoDestino,original,copia);
         }
         close(arquivoOrigem);
 
@@ -170,8 +171,10 @@ int fileCopy(const char *original, const char *copia){
 }
 
 int main(int argc, char const *argv[]){
-    if (argc != 3)
-        return erro(ENOTENOUGHARGS,-1,-1);
+    if (argc != 3){
+        errno = ENOTENOUGHARGS;
+        return erro(-1,-1,"","");
+    }
 
     char const * arquivoOrigem = argv[1];
     char const * arquivoDestino = argv[2];
