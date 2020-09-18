@@ -1,21 +1,36 @@
 #include <unistd.h>
 #include<stdio.h>
+#include<stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
+
+#define EPERM 1
+#define ENOENT 2
+#define ESRCH 3
+#define EINTR 4
 
 
 //fechar arquivos, com prevencao de erros generica
 
 int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
+    //site com os tipos de erro -> https://www.thegeekstuff.com/2010/10/linux-error-codes/
 
-    tipoDeErro = errno;
+    if(tipoDeErro == EPERM){
+        printf("Operação não permitida");
+    }
+    else if(tipoDeErro == ENOENT){
+        printf("Arquivo ou diretório não existe");
+    }else if(tipoDeErro == ESRCH){
+        printf("Sem nenhum processo");
+    }else if(tipoDeErro == EINTR){
+        printf("Chamada de sistema interrompida");
+    }
 
     close(arquivoOrigem);
     if (arquivoDestino >= 0){
         close(arquivoDestino);
     }
 
-    errno = tipoDeErro;
     return -1;
 }
 
@@ -40,7 +55,7 @@ int fileCopy(const char *original, const char *copia){
     //se retornar -1 é pq aconteceu algum erro
 
     if((arquivoOrigem = open(original, O_RDONLY)) == -1){
-        printf("Erro 1\n");
+        printf("Não foi possível abrir o arquivo %s: Arquivo ou diretório não existe.\n", original);
         return -1;
     }
 
@@ -63,8 +78,10 @@ int fileCopy(const char *original, const char *copia){
 
 
     if((arquivoDestino = open(copia, O_WRONLY | O_CREAT | O_EXCL, 0660)) == -1){
-        printf("Erro 2\n");
-        erro(capturaErro, arquivoOrigem, arquivoDestino);
+        printf("Não foi possível copiar o arquivo %s para o arquivo %s, pois o arquivo %s já existe.\n", original,copia,copia);// se o arquivo existir
+
+        erro(errno,arquivoOrigem, arquivoDestino);
+        return -1;
     }
 
 
@@ -100,19 +117,20 @@ int fileCopy(const char *original, const char *copia){
             //System calls that are interrupted by signals can either abort and return EINTR
             //chamadas de sistema q sao interrompidas podem ser abortadas e retornar EINTR
             else if (errno != EINTR){
-                printf("Erro 3\n");
-                erro(capturaErro, arquivoOrigem, arquivoDestino);
+                printf("Não foi possível executar a escrita no arquivo %s\n", copia);
+                erro(errno,arquivoOrigem, arquivoDestino);
+                return -1;
             }
 
     }
 
-    printf("%d\n ", aux);//  quantidade de nbytes
+    printf("Foram copiados %d bytes do arquivo %s para o arquivo %s\n", aux, original, copia);//  quantidade de nbytes
 
     //se entrar nesse if, é pq a operação foi concluida com sucesso
     if (leituraArquivo == 0){
         if (close(arquivoDestino) < 0){
             arquivoDestino = -1;
-            erro(capturaErro, arquivoOrigem, arquivoDestino);
+            erro(errno,arquivoOrigem, arquivoDestino);
         }
         close(arquivoOrigem);
 
@@ -120,9 +138,19 @@ int fileCopy(const char *original, const char *copia){
     }
 }
 
+
 int main(){
+
+    char *arquivoOrigem, *arquivoDestino;
+
+    scanf("%s",arquivoOrigem);
+
+    setbuf(stdin,NULL);
+    scanf("%c",arquivoDestino);// ainda n funciona
 
     //primeiro parametro é o nome do arquivo q ja existe
     //segundo parametro é o nome do arquivo a ser criado e receber a copia de dados
-    fileCopy("arquivo.c","arquivo-copia.c");
+    fileCopy(arquivoOrigem,arquivoDestino);
+
+
 }
