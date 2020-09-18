@@ -10,7 +10,7 @@
 
 int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
     //site com os tipos de erro -> https://www.thegeekstuff.com/2010/10/linux-error-codes/
-    // ENOTENOUGHARGS é definido como erro 0, e significa que não foi passado
+    // ENOTENOUGHARGS foi definido como erro 0, e significa que não foi passado
     // o número correto de argumentos para o programa
 
     /*
@@ -31,7 +31,7 @@ int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
     #define ENFILE          23      / File table overflow /
     #define EMFILE          24      / Too many open files /
     #define ENOSPC          28      / No space left on device /
-    
+
     #define EINVAL          22      / Invalid argument /
     #define EWOULDBLOCK     EAGAIN  / Operation would block /
     #define EFAULT          14      / Bad address /
@@ -87,7 +87,7 @@ int fileCopy(const char *original, const char *copia){
 
     if((arquivoOrigem = open(original, O_RDONLY)) == -1){
         printf("Não foi possível abrir o arquivo %s: Arquivo ou diretório não existe.\n", original);
-        return -1;
+        return erro(ENOENT,arquivoOrigem,arquivoDestino);
     }
 
 
@@ -111,8 +111,8 @@ int fileCopy(const char *original, const char *copia){
     if((arquivoDestino = open(copia, O_WRONLY | O_CREAT | O_EXCL, 0660)) == -1){
         printf("Não foi possível copiar o arquivo %s para o arquivo %s, pois o arquivo %s já existe.\n", original,copia,copia);// se o arquivo existir
 
-        erro(errno,arquivoOrigem, arquivoDestino);
-        return -1;
+        return erro(errno,arquivoOrigem, arquivoDestino);
+
     }
 
 
@@ -149,8 +149,8 @@ int fileCopy(const char *original, const char *copia){
             //chamadas de sistema q sao interrompidas podem ser abortadas e retornar EINTR
             else if (errno != EINTR){
                 printf("Não foi possível executar a escrita no arquivo %s\n", copia);
-                erro(errno,arquivoOrigem, arquivoDestino);
-                return -1;
+                return erro(errno,arquivoOrigem, arquivoDestino);
+
             }
 
     }
@@ -161,7 +161,7 @@ int fileCopy(const char *original, const char *copia){
     if (leituraArquivo == 0){
         if (close(arquivoDestino) < 0){
             arquivoDestino = -1;
-            erro(errno,arquivoOrigem, arquivoDestino);
+            return erro(errno,arquivoOrigem, arquivoDestino);
         }
         close(arquivoOrigem);
 
@@ -171,7 +171,7 @@ int fileCopy(const char *original, const char *copia){
 
 int main(int argc, char const *argv[]){
     if (argc != 3)
-        erro(ENOTENOUGHARGS,-1,-1);
+        return erro(ENOTENOUGHARGS,-1,-1);
 
     char const * arquivoOrigem = argv[1];
     char const * arquivoDestino = argv[2];
