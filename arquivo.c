@@ -4,11 +4,6 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#define EPERM 1
-#define ENOENT 2
-#define ESRCH 3
-#define EINTR 4
-
 
 //fechar arquivos, com prevencao de erros generica
 
