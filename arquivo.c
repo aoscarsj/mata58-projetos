@@ -141,16 +141,13 @@ int fileCopy(const char *original, const char *copia){
 
 int main(){
 
-    char *arquivoOrigem, *arquivoDestino;
+    char arquivoOrigem[60], arquivoDestino[60];
 
-    scanf("%s",arquivoOrigem);
-
-    setbuf(stdin,NULL);
-    scanf("%c",arquivoDestino);// ainda n funciona
+    scanf("%s", arquivoOrigem);
+    scanf("%s", arquivoDestino);
 
     //primeiro parametro é o nome do arquivo q ja existe
     //segundo parametro é o nome do arquivo a ser criado e receber a copia de dados
     fileCopy(arquivoOrigem,arquivoDestino);
-
 
 }
