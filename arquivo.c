@@ -1,6 +1,6 @@
 #include <unistd.h>
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
 
@@ -17,11 +17,11 @@ int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
         printf("Operação não permitida\n");
     }
     else if(tipoDeErro == ENOENT){
-        printf("Arquivo ou diretório não existe\n");
+        printf("Arquivo ou diretório não existe.\n");
     }else if(tipoDeErro == ESRCH){
-        printf("Sem nenhum processo\n");
+        printf("Sem nenhum processo.\n");
     }else if(tipoDeErro == EINTR){
-        printf("Chamada de sistema interrompida\n");
+        printf("Chamada de sistema interrompida.\n");
     }else if(tipoDeErro == ENOTENOUGHARGS){
         printf("Erro: o programa foi invocado incorretamente. ");
         printf("O programa deve ser invocado da seguinte forma:\n\n");
@@ -152,6 +152,6 @@ int main(int argc, char const *argv[]){
     //primeiro parametro é o nome do arquivo q ja existe
     //segundo parametro é o nome do arquivo a ser criado e receber a copia de dados
 
-    fileCopy(arquivoOrigem,arquivoDestino);
+    return fileCopy(arquivoOrigem,arquivoDestino);
 
 }
