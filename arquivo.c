@@ -4,24 +4,34 @@
 #include <errno.h>
 #include <fcntl.h>
 
+#define ENOTENOUGHARGS 0
 
 //fechar arquivos, com prevencao de erros generica
 
 int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
     //site com os tipos de erro -> https://www.thegeekstuff.com/2010/10/linux-error-codes/
+    // ENOTENOUGHARGS é definido como erro 0, e significa que não foi passado
+    // o número correto de argumentos para o programa
 
     if(tipoDeErro == EPERM){
-        printf("Operação não permitida");
+        printf("Operação não permitida\n");
     }
     else if(tipoDeErro == ENOENT){
-        printf("Arquivo ou diretório não existe");
+        printf("Arquivo ou diretório não existe\n");
     }else if(tipoDeErro == ESRCH){
-        printf("Sem nenhum processo");
+        printf("Sem nenhum processo\n");
     }else if(tipoDeErro == EINTR){
-        printf("Chamada de sistema interrompida");
+        printf("Chamada de sistema interrompida\n");
+    }else if(tipoDeErro == ENOTENOUGHARGS){
+        printf("Erro: o programa foi invocado incorretamente. ");
+        printf("O programa deve ser invocado da seguinte forma:\n\n");
+        printf("filecopy ArquivoOrigem ArquivoDestino\n\n");
+        printf("Nenhum arquivo foi copiado e o programa será encerrado agora.\n");
     }
 
-    close(arquivoOrigem);
+    if (arquivoOrigem >= 0) {
+        close(arquivoOrigem);
+    }
     if (arquivoDestino >= 0){
         close(arquivoDestino);
     }
@@ -133,16 +143,15 @@ int fileCopy(const char *original, const char *copia){
     }
 }
 
+int main(int argc, char const *argv[]){
+    if (argc != 3)
+        erro(ENOTENOUGHARGS,-1,-1);
 
-int main(){
-
-    char arquivoOrigem[60], arquivoDestino[60];
-
-    scanf("%s", arquivoOrigem);
-    scanf("%s", arquivoDestino);
-
+    char const * arquivoOrigem = argv[1];
+    char const * arquivoDestino = argv[2];
     //primeiro parametro é o nome do arquivo q ja existe
     //segundo parametro é o nome do arquivo a ser criado e receber a copia de dados
+
     fileCopy(arquivoOrigem,arquivoDestino);
 
 }
