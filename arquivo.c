@@ -39,14 +39,12 @@ int erro(int tipoDeErro, int arquivoOrigem, int arquivoDestino){
     #define EBADFD          77      / File descriptor in bad state /
     #define ERESTART        85      / Interrupted system call should be restarted /
     */
-    
+
     if(tipoDeErro == EPERM){
         printf("Operação não permitida\n");
     }
     else if(tipoDeErro == ENOENT){
         printf("Arquivo ou diretório não existe.\n");
-    }else if(tipoDeErro == ESRCH){
-        printf("Sem nenhum processo.\n");
     }else if(tipoDeErro == EINTR){
         printf("Chamada de sistema interrompida.\n");
     }else if(tipoDeErro == ENOTENOUGHARGS){
