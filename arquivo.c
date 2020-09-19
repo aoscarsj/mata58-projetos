@@ -12,10 +12,11 @@ typedef enum{false,true} bool;
 
 int erro(int arquivoOrigem, int arquivoDestino,
          char const * nomeArquivoOrigem, char const * nomeArquivoDestino){
-    //site com os tipos de erro -> https://ftp.gnu.org/old-gnu/Manuals/glibc-2.2.3/html_node/libc_17.html
 
-    // ENOTENOUGHARGS foi definido como erro 256, e significa que não foi passado
-    // o número correto de argumentos para o programa
+
+    bool erroFatal = true;
+    // caso seja atribuído "false" o erro será ignorado, porém ainda assim
+    // será sinalizado
 
     switch (errno) {
         case ENOSPC:
@@ -57,6 +58,7 @@ int erro(int arquivoOrigem, int arquivoDestino,
 
         case EBUSY:
             printf("Erro: dispositivo ou recurso estão ocupados.\n");
+            erroFatal = false;
             break;
 
         case EFBIG:
@@ -72,13 +74,16 @@ int erro(int arquivoOrigem, int arquivoDestino,
         case ETXTBSY:
             printf("Erro: um dos arquivos está sendo utilizado no momento ");
             printf("por outro programa.\n");
+            erroFatal = false;
             break;
 
         case ENOTENOUGHARGS:
+            // ENOTENOUGHARGS foi definido como erro 256, e significa que não foi passado
+            // o número correto de argumentos para o programa
             printf("Erro: o programa foi invocado incorretamente. ");
             printf("O programa deve ser invocado da seguinte forma:\n\n");
             printf("filecopy ArquivoOrigem ArquivoDestino\n\n");
-            printf("Nenhum arquivo foi copiado e o programa será encerrado.\n");
+            printf("Nenhum arquivo foi copiado. ");
             break;
 
         case EPERM:
@@ -92,6 +97,7 @@ int erro(int arquivoOrigem, int arquivoDestino,
 
         case EINTR:
             printf("Erro: chamada de sistema interrompida.\n");
+            erroFatal = false;
             break;
 
         case EEXIST:
@@ -112,14 +118,19 @@ int erro(int arquivoOrigem, int arquivoDestino,
 
         default:
             perror("Um erro ocorreu");
+            printf("\n");
             break;
     }
 
-    if (arquivoOrigem >= 0) {
-        close(arquivoOrigem);
-    }
-    if (arquivoDestino >= 0){
-        close(arquivoDestino);
+    if (erroFatal){
+        printf("O programa será encerrado.\n");
+        if (arquivoOrigem >= 0) {
+            close(arquivoOrigem);
+        }
+        if (arquivoDestino >= 0){
+            close(arquivoDestino);
+        }
+
     }
 
     return -1;
