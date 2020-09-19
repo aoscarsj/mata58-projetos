@@ -46,6 +46,7 @@ int erro(int arquivoOrigem, int arquivoDestino,
             printf("Operação não permitida\n");
             break;
         case ENOENT:
+            printf("Não foi possível abrir o arquivo %s: ", original);
             printf("Arquivo ou diretório não existe.\n");
             break;
         case EINTR:
@@ -80,14 +81,13 @@ int fileCopy(const char *original, const char *copia){
     char buffer[4096]; // transferir somente 4kb, seguindo a exigencia da implementação
     int capturaErro;
     int leituraArquivo;
-    int aux=0;
+    int bytesEscritos = 0;
 
     //original é o nome do arquivo que ja existe e vai ser copiado
     //segundo parametro é a permissao do mesmo, no caso é somente para leitura: O_RDONLY == read only
     //se retornar -1 é pq aconteceu algum erro
 
     if((arquivoOrigem = open(original, O_RDONLY)) == -1){
-        printf("Não foi possível abrir o arquivo %s: Arquivo ou diretório não existe.\n", original);
         return erro(arquivoOrigem,arquivoDestino,original,copia);
     }
 
@@ -130,7 +130,7 @@ int fileCopy(const char *original, const char *copia){
     */
 
     /*no if é onde ocorre de fato a copia do arquivo
-      e tb onde é capturado o numero de bytes com o 'aux'
+      e tb onde é capturado o numero de bytes com o 'bytesEscritos'
     */
     while (leituraArquivo = read(arquivoOrigem, buffer, sizeof buffer), leituraArquivo > 0){
         char *ponteiroEscrita = buffer;
@@ -141,7 +141,7 @@ int fileCopy(const char *original, const char *copia){
             if (escritaArquivo >= 0){
                 leituraArquivo -= escritaArquivo;
                 ponteiroEscrita += escritaArquivo;
-                aux += escritaArquivo;
+                bytesEscritos += escritaArquivo;
                 //printf("%d\n ", aux); caso queira ver se o arquivo esta sendo enviado de 4 em 4kb
 
             }
@@ -149,14 +149,12 @@ int fileCopy(const char *original, const char *copia){
             //System calls that are interrupted by signals can either abort and return EINTR
             //chamadas de sistema q sao interrompidas podem ser abortadas e retornar EINTR
             else if (errno != EINTR){
-                printf("Não foi possível executar a escrita no arquivo %s\n", copia);
                 return erro(arquivoOrigem, arquivoDestino,original,copia);
-
             }
 
     }
 
-    printf("Foram copiados %d bytes do arquivo %s para o arquivo %s\n", aux, original, copia);//  quantidade de nbytes
+    printf("Foram copiados %d bytes do arquivo %s para o arquivo %s\n", bytesEscritos, original, copia);//  quantidade de nbytes
 
     //se entrar nesse if, é pq a operação foi concluida com sucesso
     if (leituraArquivo == 0){
