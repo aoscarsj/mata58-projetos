@@ -132,7 +132,6 @@ int erro(int arquivoOrigem, int arquivoDestino,
 int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     int arquivoDestino = -1, arquivoOrigem = -1; // receberão os file descriptors
     char buffer[4096]; // buffer de leitura de 4kb
-    int nBytesLidos = 0;
     int nBytesEscritosTotal = 0;
 
     // O_RDONLY -> modo somente leitura ao abrir o arquivo
@@ -140,11 +139,6 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     if((arquivoOrigem = open(nomeOriginal, O_RDONLY)) == -1){
         return erro(arquivoOrigem,arquivoDestino,nomeOriginal,nomeCopia);
     }
-
-
-
-
-
 
     /*
     O_WRONLY -> modo somente escrita
@@ -158,38 +152,34 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
         ----rw-rw-
     */
     if((arquivoDestino = open(nomeCopia, O_WRONLY | O_CREAT | O_EXCL, 0660)) == -1){
-
-
         return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
-
     }
 
 
-    // é criado um ponteiro auxiliar para que não se passe buffer diretamente para
-    // a função write()
+    // é criado um ponteiro auxiliar para que não se passe buffer diretamente
+    // para a função write()
 
+    int nBytesLidos = 0;
+    int nBytesEscritos;
+    // loop que realiza a escrita e a contagem dos bytes escritos
     while (nBytesLidos = read(arquivoOrigem, buffer, sizeof buffer), nBytesLidos > 0){
-        char *ponteiroEscrita = buffer;
-        int nBytesEscritos;
 
-        nBytesEscritos = write(arquivoDestino, ponteiroEscrita, nBytesLidos);
+        nBytesEscritos = write(arquivoDestino, buffer, nBytesLidos);
+        // nem sempre serã lido um buffer inteiro (caso alcance o fim do arquivo)
 
         if (nBytesEscritos >= 0){
-            // aqui os contadores
-            nBytesLidos -= nBytesEscritos;
-            ponteiroEscrita += nBytesEscritos;
             nBytesEscritosTotal += nBytesEscritos;
+        }else if (errno != EINTR){
+            // ignora o erro EINTR, pois a leitura pode ser tentada novamente
+            // sem perdas
+            return erro(arquivoOrigem, arquivoDestino, nomeOriginal, nomeCopia);
         }
 
-        // ignora o erro EINTR, pois a leitura pode ser tentada novamente
-        // sem perdas
-        else if (errno != EINTR){
-            return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
-        }
 
     }
 
-    printf("Foram copiados %d bytes do arquivo %s para o arquivo %s\n", nBytesEscritosTotal, nomeOriginal, nomeCopia);
+    printf("Foram copiados %d bytes ", nBytesEscritosTotal);
+    printf("do arquivo %s para o arquivo %s\n\n", nomeOriginal, nomeCopia);
 
     // rotina de encerramento, fechando os arquivos
     if (nBytesLidos == 0){
