@@ -144,14 +144,13 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     O_WRONLY -> modo somente escrita
     O_CREAT -> criar o arquivo caso não exista
     O_EXCL -> previne a criação caso já exista
-     valor de retorno -1 sinaliza que um erro ocorreu
-    o numero 0660 representa a permissao do arquivo em hexadecimal, no caso:
-      0660 significa que usuarios do mesmo grupo do criador do arquivo podem
-      ler e escrever e também qualquer outro tipo de usuario também pode
-      ler e escrever
-        ----rw-rw-
+    valor de retorno -1 sinaliza que um erro ocorreu
+
+    o código 0777 representa os níveis de permissao do arquivo a ser criado
+    em octal. 0777 é o maior nível de permissão, onde tanto o usuário, usuários
+    do mesmo grupo e quaisquer outros podem ler, escrever e executar o arquivo.
     */
-    if((arquivoDestino = open(nomeCopia, O_WRONLY | O_CREAT | O_EXCL, 0660)) == -1){
+    if((arquivoDestino = open(nomeCopia, O_WRONLY | O_CREAT | O_EXCL, 0777)) == -1){
         return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
     }
 
