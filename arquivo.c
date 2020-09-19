@@ -103,9 +103,9 @@ int erro(int arquivoOrigem, int arquivoDestino,
         case EISDIR:
             printf("Erro: Não foi possível abrir o arquivo ");
             if (arquivoOrigem < 0) {
-                printf("%s pois %s ", nomeArquivoOrigem);
+                printf("%s pois %s ", nomeArquivoOrigem, nomeArquivoOrigem );
             }else if(arquivoDestino < 0){
-                printf("%s pois %s ", nomeArquivoDestino);
+                printf("%s pois %s ", nomeArquivoDestino, nomeArquivoDestino);
             }
             printf("é um diretório e não um arquivo.\n");
             break;
