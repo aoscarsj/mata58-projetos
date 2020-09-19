@@ -12,7 +12,13 @@ typedef enum{false,true} bool;
 
 int erro(int arquivoOrigem, int arquivoDestino,
          char const * nomeArquivoOrigem, char const * nomeArquivoDestino){
-
+    /*
+        A função "erro" recebe as informações sobre o estado das variáveis re-
+        ferentes aos arquivos, avalia o valor da variável global errno e imprime
+        uma mensagem de erro adequada, fechando os file descriptors e encerrando
+        o programa se necessário. Alguns erros são apenas notificados, mas não
+        causam encerramento do programa.
+    */
 
     bool erroFatal = true;
     // caso seja atribuído "false" o erro será ignorado, porém ainda assim
@@ -130,7 +136,6 @@ int erro(int arquivoOrigem, int arquivoDestino,
         if (arquivoDestino >= 0){
             close(arquivoDestino);
         }
-
     }
 
     return -1;
@@ -141,6 +146,14 @@ int erro(int arquivoOrigem, int arquivoDestino,
 
 
 int fileCopy(const char * nomeOriginal, const char * nomeCopia){
+    /*
+    A função fileCopy realiza o trabalho de copiar o arquivo nomeOriginal para
+    o novo arquivo nomeCopia.
+
+    Retorna 0 caso a cópia tenha sido executada com sucesso, e retorna -1 caso
+    tenha acontecido algum erro.
+    */
+
     int arquivoDestino = -1, arquivoOrigem = -1; // receberão os file descriptors
     char buffer[4096]; // buffer de leitura de 4kb
     int nBytesEscritosTotal = 0;
@@ -194,10 +207,11 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     // rotina de encerramento, fechando os arquivos
     if (nBytesLidos == 0){
         if (close(arquivoDestino) < 0){
-            arquivoDestino = -1;
             return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
         }
-        close(arquivoOrigem);
+        if (close(arquivoOrigem) < 0){
+            return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
+        }
 
         return 0;
     }
