@@ -6,51 +6,92 @@
 
 #define ENOTENOUGHARGS 256
 
-//fechar arquivos, com prevencao de erros generica
+typedef enum{false,true} bool;
+
+//fechar arquivos, com prevencao de erros
 
 int erro(int arquivoOrigem, int arquivoDestino,
          char const * nomeArquivoOrigem, char const * nomeArquivoDestino){
-    //site com os tipos de erro -> https://www.thegeekstuff.com/2010/10/linux-error-codes/
+    //site com os tipos de erro -> https://ftp.gnu.org/old-gnu/Manuals/glibc-2.2.3/html_node/libc_17.html
 
     // ENOTENOUGHARGS foi definido como erro 256, e significa que não foi passado
     // o número correto de argumentos para o programa
 
-    /*
-    A INCLUIR
-
-
-    #define EIO              5      / I/O error /
-    #define EEXIST          17      / File exists /
-    #define EISDIR          21      / Is a directory /
-    #define ETXTBSY         26      / Text file busy /
-    #define EBADF            9      / Bad file number /
-    #define EROFS           30      / Read-only file system /
-    #define ENOMEM          12      / Out of memory /
-    #define EBUSY           16      / Device or resource busy /
-    #define EFBIG           27      / File too large /
-    #define EACCES          13      / Permission denied /
-    #define ENAMETOOLONG    36      / File name too long /
-    #define ENFILE          23      / File table overflow /
-    #define EMFILE          24      / Too many open files /
-    #define ENOSPC          28      / No space left on device /
-    */
     switch (errno) {
+        case ENOSPC:
+            printf("Erro: não há espaço livre no dispositivo de armazenamento.\n");
+            break;
+        case ENFILE:
+            // nunca ocorre no GNU, mas está definido devido ao POSIX
+            printf("Erro: o limite de arquivos abertos no sistema ");
+            printf("foi atingido.\n");
+            break;
+        case EMFILE:
+            printf("Erro: o limite de arquivos abertos para esse processo ");
+            printf("foi atingido.\n");
+            break;
+        case ENAMETOOLONG:
+            printf("Erro: não foi possível ");
+            if (arquivoOrigem < 0){
+                printf("abrir o arquivo %s ", nomeArquivoOrigem);
+            }else if (arquivoDestino < 0){
+                printf("criar o arquivo %s ", nomeArquivoDestino);
+            }
+            printf("pois o nome do arquivo é muito longo.\n");
+            break;
+        case EACCES:
+            printf("Erro: o usuário não tem acesso a esse diretório.\n");
+            break;
+        case EROFS:
+            printf("Erro: o sistema de arquivos é de somente leitura.\n");
+            break;
+        case ENOMEM:
+            printf("Erro: memória de sistema insuficiente para a operação.\n");
+            break;
+        case EBUSY:
+            printf("Erro: dispositivo ou recurso estão ocupados.\n");
+            break;
+        case EFBIG:
+            printf("Erro: o arquivo %s não pode ser ", nomeArquivoOrigem);
+            printf("copiado pois seu tamanho é maior do que o máximo ");
+            printf("permitido pelo sistema de arquivos.\n");
+            break;
+        case EBADF:
+            printf("Erro: o descriptor do arquivo é inadequado.\n");
+            break;
+        case ETXTBSY:
+            printf("Erro: um dos arquivos está sendo utilizado no momento ");
+            printf("por outro programa.\n");
+            break;
         case ENOTENOUGHARGS:
-            perror("Um erro ocorreu");
             printf("Erro: o programa foi invocado incorretamente. ");
             printf("O programa deve ser invocado da seguinte forma:\n\n");
             printf("filecopy ArquivoOrigem ArquivoDestino\n\n");
             printf("Nenhum arquivo foi copiado e o programa será encerrado.\n");
             break;
         case EPERM:
-            printf("Operação não permitida\n");
+            printf("Erro: Operação não permitida ao usuário.\n");
             break;
         case ENOENT:
-            printf("Não foi possível abrir o arquivo %s: ", original);
+            printf("Erro: Não foi possível abrir o arquivo %s: ", nomeArquivoOrigem);
             printf("Arquivo ou diretório não existe.\n");
             break;
         case EINTR:
-            printf("Chamada de sistema interrompida.\n");
+            printf("Erro: chamada de sistema interrompida.\n");
+            break;
+        case EEXIST:
+            printf("Erro: Não foi possível copiar o arquivo ");
+            printf("%s para o arquivo %s\n", nomeArquivoOrigem,nomeArquivoDestino);
+            printf("pois o arquivo %s já existe.\n", nomeArquivoDestino);
+            break;
+        case EISDIR:
+            printf("Erro: Não foi possível abrir o arquivo ");
+            if (arquivoOrigem < 0) {
+                printf("%s pois %s ", nomeArquivoOrigem);
+            }else if(arquivoDestino < 0){
+                printf("%s pois %s ", nomeArquivoDestino);
+            }
+            printf("é um diretório e não um arquivo.\n");
             break;
         default:
             perror("Um erro ocorreu");
@@ -110,7 +151,7 @@ int fileCopy(const char *original, const char *copia){
 
 
     if((arquivoDestino = open(copia, O_WRONLY | O_CREAT | O_EXCL, 0660)) == -1){
-        printf("Não foi possível copiar o arquivo %s para o arquivo %s, pois o arquivo %s já existe.\n", original,copia,copia);// se o arquivo existir
+
 
         return erro(arquivoOrigem, arquivoDestino,original,copia);
 
