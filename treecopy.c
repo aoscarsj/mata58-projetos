@@ -14,7 +14,7 @@
 #define MAXFILEPERMS 0777
 enum points_of_error{UNKNOWN,WHILE_ENTERING_MAIN,WHILE_MAKING_DIR,
                      WHILE_OPENING_DIR,WHILE_READING_DIR};
-// int errorTreeCopy(int dirOrigin, int dirDestiny,
+// int errorDirCopy(int dirOrigin, int dirDestiny,
 //          char const * nomeDirOrigem, char const * nomeDirDestino);
 int errorDirCopy(DIR * dirOrigin,
                  char * dirOriginPath, char * dirDestinyPath, enum points_of_error PoE);
@@ -29,7 +29,7 @@ int treeCopy(char *originalPath, char *destinyPath);
 int main(int argc, char *argv[]){
     if (argc != 3){
         errno = ENOTENOUGHARGS;
-        return errorDirCopy(NULL,"","");
+        return errorDirCopy(NULL,"","",WHILE_ENTERING_MAIN);
         //  esses argumentos para a função error() sinalizam que nenhum arquivo
         //  foi aberto.
     }
@@ -41,14 +41,12 @@ int main(int argc, char *argv[]){
         printf("treecopy: foram copiados %i diretórios, %i arquivos e %llu bytes de %s para %s\n", totalDirs, totalFiles, totalBytes, pastaOrigem, pastaDestino);
 
     }else{
-        errorTreeCopy(NULL,pastaOrigem,pastaDestino);
+        errorDirCopy(NULL,pastaOrigem,pastaDestino,WHILE_MAKING_DIR);
     }
     return 0;
 }
-// int errorTreeCopy(int dirOrigin, int dirDestiny,
+// int errorDirCopy(int dirOrigin, int dirDestiny,
 //          char const * nomeDirOrigem, char const * nomeDirDestino);
-int errorDirCopy(DIR * dirOrigin,
-                 char * dirOriginPath, char * dirDestinyPath, enum points_of_error
 int treeCopy(char *originalPath, char *destinyPath){
     /*
     *
@@ -68,7 +66,6 @@ int treeCopy(char *originalPath, char *destinyPath){
                 strcpy(newPathOriginal, originalPath);
                 strcat(newPathOriginal, "/");
                 strcat(newPathOriginal, child->d_name);
-                printf("%s\n", child->d_name);
 
 
                 strcpy(newPathDestiny, destinyPath);
@@ -80,18 +77,19 @@ int treeCopy(char *originalPath, char *destinyPath){
                 totalBytes += fileCopy(newPathOriginal, newPathDestiny);
             }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..")  != 0){
                 totalDirs++;
+                printf("\n\n%s\n\n",newPathDestiny );
                 //Não pode ser um arquivo nem a pasta . e nem a pasta ..
                 if(!mkdir(newPathDestiny,MAXFILEPERMS))
-                    errorDirCopy(NULL,originalPath,destinyPath);
+                    errorDirCopy(NULL,originalPath,destinyPath,WHILE_MAKING_DIR);
 
                 treeCopy(newPathOriginal, newPathDestiny);
             }
             child = readdir(origem);
         }
         if (errno == EBADF)
-            errorDirCopy(origem,originalPath,destinyPath);
+            errorDirCopy(origem,originalPath,destinyPath,WHILE_READING_DIR);
     }else{
-        errorDirCopy(NULL,originalPath,destinyPath);
+        errorDirCopy(NULL,originalPath,destinyPath,WHILE_OPENING_DIR);
     }
 
     return 1;
@@ -119,7 +117,7 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
             printf("Não foi possível ler o diretório %s", dirOriginPath);
             break;
         default:
-            printf("Um erro ocorreu", );
+            printf("Um erro ocorreu");
             break;
     }
 
@@ -202,16 +200,16 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
             printf("treecopy <diretorioorigem> <diretoriodestino>\n\n");
             printf("Nada foi copiado. ");
             break;
-            
+
         default:
-            perrorr("");
+            perror("");
             printf("\n");
             break;
     }
 //
     printf("O programa será encerrado.\n");
     if (dirOrigin != NULL) {
-        close(dirOrigin);
+        closedir(dirOrigin);
     }
 
     return -1;

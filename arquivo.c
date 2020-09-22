@@ -20,7 +20,6 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     Retorna 0 caso a cópia tenha sido executada com sucesso, e retorna -1 caso
     tenha acontecido algum erro.
     */
-
     int arquivoDestino = -1, arquivoOrigem = -1; // receberão os file descriptors
     char buffer[4096]; // buffer de leitura de 4kb
     int nBytesEscritosTotal = 0;
