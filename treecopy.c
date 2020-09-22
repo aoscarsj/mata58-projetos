@@ -41,6 +41,7 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
 int treeCopy(char *originalPath, char *destinyPath);
 
 int main(int argc, char *argv[]){
+    int returnvalue = 0;
     if (argc != 3){
         errno = ENOTENOUGHARGS;
         return errorDirCopy(NULL,"","",WHILE_ENTERING_MAIN);
@@ -51,14 +52,15 @@ int main(int argc, char *argv[]){
     char * pastaDestino = argv[2];
 
     if(!mkdir(pastaDestino,MAXFILEPERMS)){
-        treeCopy(pastaOrigem, pastaDestino);
-        printf("treecopy: foram copiados %i diretórios, %i arquivos e %llu bytes de %s para %s\n", totalDirs, totalFiles, totalBytes, pastaOrigem, pastaDestino);
-
+        returnvalue = treeCopy(pastaOrigem, pastaDestino);
+        printf("treecopy: foram copiados %i diretórios, ", totalDirs);
+        printf("%i arquivos e %llu bytes ", totalFiles, totalBytes);
+        printf("de %s para %s\n", pastaOrigem, pastaDestino);
     }else{
-        errorDirCopy(NULL,pastaOrigem,pastaDestino,WHILE_MAKING_DIR);
+        return errorDirCopy(NULL,pastaOrigem,pastaDestino,WHILE_MAKING_DIR);
     }
 
-    return 0;
+    return returnvalue;
 }
 
 int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
@@ -178,12 +180,13 @@ int treeCopy(char *originalPath, char *destinyPath){
     if(origem){
         struct dirent *child = readdir(origem);
         while( child != NULL){
-            // o loop percorre todo o conteúdo do diretório até readdir(origem)
-            // retornar NULL
+            // o loop percorre todo o conteúdo do diretório até que
+            // readdir(origem) retorne NULL
 
 
             char newPathOriginal[PATH_MAX];
             char newPathDestiny[PATH_MAX];
+
             strcpy(newPathOriginal, originalPath);
             strcat(newPathOriginal, "/");
             strcat(newPathOriginal, child->d_name);
@@ -193,26 +196,33 @@ int treeCopy(char *originalPath, char *destinyPath){
             strcat(newPathDestiny, "/");
             strcat(newPathDestiny, child->d_name);
 
-        if(child->d_type == FILE){
-            totalFiles++;
-            totalBytes += fileCopy(newPathOriginal, newPathDestiny);
-        }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..")  != 0){
-            totalDirs++;
-            //Não pode ser um arquivo nem a pasta . e nem a pasta ..
-            if(mkdir(newPathDestiny,MAXFILEPERMS)){
-                errorDirCopy(NULL,newPathOriginal,newPathDestiny,WHILE_MAKING_DIR);
+            if(child->d_type == FILE){
+                totalFiles++;
+                int copiedBytes = fileCopy(newPathOriginal, newPathDestiny);
+                if (copiedBytes == -1) {
+                    return -1;
+                }else{
+                    totalBytes += copiedBytes;
+                }
+            }else if(strcmp(child->d_name, ".") && strcmp(child->d_name, "..")){
+                // filtra os diretórios relativos . e ..
+                if(mkdir(newPathDestiny,MAXFILEPERMS)){
+                    return errorDirCopy(NULL,newPathOriginal,newPathDestiny,WHILE_MAKING_DIR);
 
+                }
+
+                int successful = treeCopy(newPathOriginal, newPathDestiny);
+                if (!successful)
+                    return -1;
+                totalDirs++;
             }
-
-            treeCopy(newPathOriginal, newPathDestiny);
-        }
-        child = readdir(origem);
+            child = readdir(origem);
         }
         if (errno == EBADF) {
-                errorDirCopy(origem,originalPath,destinyPath,WHILE_READING_DIR);
+            return errorDirCopy(origem,originalPath,destinyPath,WHILE_READING_DIR);
         }
     }else{
-        errorDirCopy(NULL,originalPath,destinyPath,WHILE_OPENING_DIR);
+        return errorDirCopy(NULL,originalPath,destinyPath,WHILE_OPENING_DIR);
     }
 
     return 0;
