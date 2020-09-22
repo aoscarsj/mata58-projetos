@@ -28,12 +28,10 @@ algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
 #include "arquivo.c"
 
 #define FILE 8
-#define ENOTENOUGHARGS 256
+#define ENOTENOUGHARGS 255
 #define MAXFILEPERMS 0777
 enum points_of_error{UNKNOWN,WHILE_ENTERING_MAIN,WHILE_MAKING_DIR,
                      WHILE_OPENING_DIR,WHILE_READING_DIR};
-// int errorDirCopy(int dirOrigin, int dirDestiny,
-//          char const * nomeDirOrigem, char const * nomeDirDestino);
 unsigned long long totalBytes = 0;
 unsigned int totalFiles = 0, totalDirs = 0;
 
@@ -46,8 +44,8 @@ int main(int argc, char *argv[]){
     if (argc != 3){
         errno = ENOTENOUGHARGS;
         return errorDirCopy(NULL,"","",WHILE_ENTERING_MAIN);
-        //  esses argumentos para a função error() sinalizam que nenhum arquivo
-        //  foi aberto.
+        //  os argumentos vazios (NULL,"","") são necessários pois nada foi
+        // acessado ainda
     }
     char * pastaOrigem = argv[1];
     char * pastaDestino = argv[2];
@@ -65,7 +63,7 @@ int main(int argc, char *argv[]){
 
 int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
                  char * dirDestinyPath, enum points_of_error PoE){
-    switch (PoE) {
+    switch (PoE) { // Prefixo que indica onde o erro ocorreu
         case WHILE_MAKING_DIR:
             printf("Não foi possível criar o diretório %s",dirDestinyPath);
             break;
@@ -80,7 +78,7 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
             break;
     }
 
-    switch (errno) {
+    switch (errno) { // sufixo que indica qual foi o tipo de erro
         case EPERM:
             printf(": operação não permitida ao usuário.\n");
             break;
@@ -152,7 +150,7 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
             printf(": parâmetros não suportados.\n");
 
         case ENOTENOUGHARGS:
-            // ENOTENOUGHARGS foi definido como error 256, e significa que não foi passado
+            // ENOTENOUGHARGS foi definido como error 255, e significa que não foi passado
             // o número correto de argumentos para o programa
             printf(": o programa foi invocado incorretamente. ");
             printf("O programa deve ser invocado da seguinte forma:\n\n");

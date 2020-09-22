@@ -27,7 +27,7 @@ algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
 #include <errno.h>
 #include <fcntl.h>
 
-#define ENOTENOUGHARGS 256
+#define ENOTENOUGHARGS 255
 
 typedef enum{false,true} bool;
 

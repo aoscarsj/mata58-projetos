@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#define ENOTENOUGHARGS 256
+#define ENOTENOUGHARGS 255
 
 typedef enum{false,true} bool;
 int erro(int arquivoOrigem, int arquivoDestino,
@@ -86,7 +86,7 @@ int erro(int arquivoOrigem, int arquivoDestino,
             break;
 
         case ENOTENOUGHARGS:
-            // ENOTENOUGHARGS foi definido como erro 256, e significa que não foi passado
+            // ENOTENOUGHARGS foi definido como erro 255, e significa que não foi passado
             // o número correto de argumentos para o programa
             printf("Erro: o programa foi invocado incorretamente. ");
             printf("O programa deve ser invocado da seguinte forma:\n\n");
