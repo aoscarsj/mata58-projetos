@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include "arquivo.c"
 int createDir(char *path);
+unsigned long long bytesTotal = 0;
 int list(char *originalPath, char *destinyPath){
     DIR *origem = opendir(originalPath);
     
@@ -20,11 +21,17 @@ int list(char *originalPath, char *destinyPath){
             // enquanto o diretório tiver arquivo ou pasta, continue executando.
             
             if(child->d_type == 8){
-                char pathChild[500];
-                strcpy(pathChild, originalPath);
-                strcat(pathChild, "/");
-                strcat(pathChild, child->d_name);
-                fileCopy(pathChild, destinyPath);
+                char originalPathChild[500];
+                char destinyPathChild[500];
+                strcpy(originalPathChild, originalPath);
+                strcat(originalPathChild, "/");
+                strcat(originalPathChild, child->d_name);
+
+                strcpy(destinyPathChild, destinyPath);
+                strcat(destinyPathChild, "/");
+                strcat(destinyPathChild, child->d_name);
+                
+                fileCopy(originalPathChild, destinyPathChild);
 
             }else if(strcmp(child->d_name, ".") !=0 
                 && strcmp(child->d_name, "..")  != 0){

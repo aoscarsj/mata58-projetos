@@ -215,6 +215,7 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
 
         return 0;
     }
+    return nBytesEscritosTotal;
 }
 
 // int main(int argc, char const *argv[]){
