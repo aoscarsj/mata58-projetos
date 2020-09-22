@@ -5,68 +5,55 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
-
-void treeCopy(const char *dirOrigem, const char *dirDestino) {
-    DIR *dir;
-    DIR *dirDest;
-    int pastaCriada;
-
-    //abrindo pasta original
+#include <dirent.h>
+#include "arquivo.c"
+int createDir(char *path);
+int list(char *originalPath, char *destinyPath){
+    DIR *origem = opendir(originalPath);
     
-    if (!(dir = opendir(dirOrigem))) {
-        fprintf(stderr, "Arquivo ou diretório não existe: %s: %s\n", dirOrigem, strerror(errno));
-        return;
-    }
+    if(origem){
+        // abriu o diretório de origem
+        struct dirent *child = readdir(origem);
+        printf("Path: %s\n", originalPath);
+        while( child != NULL){
+            
+            // enquanto o diretório tiver arquivo ou pasta, continue executando.
+            if(child->d_type == 4){
+                char pathChild[500];
+                strcpy(pathChild, originalPath);
+                strcat(pathChild, "/");
+                strcat(pathChild, child->d_name);
+                fileCopy(pathChild, destinyPath);
+            }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..") != 0){
+                //Não pode ser um arquivo nem a pasta . e nem a pasta .. 
+                char newPathOriginal[500];
+                char newPathDestiny[500];
+                strcpy(newPathOriginal, originalPath);
+                strcat(newPathOriginal, "/");
+                strcat(newPathOriginal, child->d_name);
+                
 
-    // criando nova pasta
-
-    pastaCriada = mkdir(dirDestino,0660);
-
-    if(pastaCriada){
-        printf("Não foi possível criar o diretório!\n");
-        return;
-    }
-
-    //abrindo nova pasta
-
-    if (!(dirDest = opendir(dirDestino))) {
-        fprintf(stderr, "Não foi possivel abrir o arquivo: %s: %s\n", dirDestino, strerror(errno));
-        return;
-    }
-
-    char Path[256], *EndPtr = Path;
-        struct dirent *e;
-        strcpy(Path, dirOrigem);                  //Copies the current path to the 'Path' variable.
-        EndPtr += strlen(dirOrigem);              //Moves the EndPtr to the ending position.
-        while((e = readdir(dir)) != NULL) {  //Iterates through the entire directory.
-            struct stat info;                //Helps us know about stuff
-            strcpy(EndPtr, e->d_name);       //Copies the current filedirOrigem to the end of the path, overwriting it with each loop.
-            printf("%s \n", EndPtr);             //printing the root files
-
-            //fileCopy(EndPtr, "EndPtr");
-            if(!stat(Path, &info)) {         //stat returns zero on success.
-                if(S_ISDIR(info.st_mode)) {  //Are we dealing with a directory?
-                    //Make corresponding directory in the target folder here.
-                    
-                    treeCopy(Path,dirDestino);   //Calls this function AGAIN, this time with the sub-dirOrigem.
-                } else if(S_ISREG(info.st_mode) ){ //Or did we find a regular file?
-                    //fileCopy(, dirOrigem);
-                    
-                }
+                strcpy(newPathDestiny, destinyPath);
+                strcat(newPathDestiny, "/");
+                strcat(newPathDestiny, child->d_name);
+                createDir(newPathDestiny);
+                printf("Path: %s\n", newPathOriginal);
+                list(newPathOriginal, newPathDestiny);
             }
+            child = readdir(origem);
         }
+    }
 
-
-    closedir(dir);
-    closedir(dirDest);
-   
-    
+    return 1;
 }
 
-int main(void) {
+int createDir(char *path){
+    return mkdir(path, 0777); //deveriamos copiar o modo da pasta original n?
+}
 
-    treeCopy("pasta","pasta-copia");
-   
-
-    return(0);
+int main(){
+    if(!createDir("pastacopy")){
+        list("pasta", "pastacopy");
+    }
+    return (0);
 }

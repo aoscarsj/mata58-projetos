@@ -217,18 +217,18 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     }
 }
 
-// int main(int argc, char const *argv[]){
-//     if (argc != 3){
-//         errno = ENOTENOUGHARGS;
-//         return erro(-1,-1,"","");
-//         //  esses argumentos para a função erro() sinalizam que nenhum arquivo
-//         //  foi aberto.
-//     }
+int main(int argc, char const *argv[]){
+    if (argc != 3){
+        errno = ENOTENOUGHARGS;
+        return erro(-1,-1,"","");
+        //  esses argumentos para a função erro() sinalizam que nenhum arquivo
+        //  foi aberto.
+    }
 
-//     char const * arquivoOrigem = argv[1];
-//     char const * arquivoDestino = argv[2];
+    char const * arquivoOrigem = argv[1];
+    char const * arquivoDestino = argv[2];
 
 
-//     return fileCopy(arquivoOrigem,arquivoDestino);
+    return fileCopy(arquivoOrigem,arquivoDestino);
 
-// }
+}
