@@ -1,3 +1,6 @@
+#ifndef ARQUIVOMATA58_C
+#define ARQUIVOMATA58_C
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -201,9 +204,6 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
 
     }
 
-    // printf("Foram copiados %d bytes ", nBytesEscritosTotal);
-    // printf("do arquivo %s para o arquivo %s\n\n", nomeOriginal, nomeCopia);
-
     // rotina de encerramento, fechando os arquivos
     if (nBytesLidos == 0){
         if (close(arquivoDestino) < 0){
@@ -215,20 +215,8 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
 
         return nBytesEscritosTotal;
     }
+
+    return -1;
 }
 
-// int main(int argc, char const *argv[]){
-//     if (argc != 3){
-//         errno = ENOTENOUGHARGS;
-//         return erro(-1,-1,"","");
-//         //  esses argumentos para a função erro() sinalizam que nenhum arquivo
-//         //  foi aberto.
-//     }
-
-//     char const * arquivoOrigem = argv[1];
-//     char const * arquivoDestino = argv[2];
-
-
-//     return fileCopy(arquivoOrigem,arquivoDestino);
-
-// }
+#endif /*ARQUIVOMATA58_C*/
