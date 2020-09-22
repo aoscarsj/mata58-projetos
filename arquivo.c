@@ -201,8 +201,8 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
 
     }
 
-    printf("Foram copiados %d bytes ", nBytesEscritosTotal);
-    printf("do arquivo %s para o arquivo %s\n\n", nomeOriginal, nomeCopia);
+    // printf("Foram copiados %d bytes ", nBytesEscritosTotal);
+    // printf("do arquivo %s para o arquivo %s\n\n", nomeOriginal, nomeCopia);
 
     // rotina de encerramento, fechando os arquivos
     if (nBytesLidos == 0){
@@ -213,9 +213,8 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
             return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
         }
 
-        return 0;
+        return nBytesEscritosTotal;
     }
-    return nBytesEscritosTotal;
 }
 
 // int main(int argc, char const *argv[]){
