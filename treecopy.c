@@ -18,13 +18,16 @@ int list(char *originalPath, char *destinyPath){
         while( child != NULL){
             
             // enquanto o diretório tiver arquivo ou pasta, continue executando.
-            if(child->d_type == 4){
+            
+            if(child->d_type == 8){
                 char pathChild[500];
                 strcpy(pathChild, originalPath);
                 strcat(pathChild, "/");
                 strcat(pathChild, child->d_name);
                 fileCopy(pathChild, destinyPath);
-            }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..") != 0){
+
+            }else if(strcmp(child->d_name, ".") !=0 
+                && strcmp(child->d_name, "..")  != 0){
                 //Não pode ser um arquivo nem a pasta . e nem a pasta .. 
                 char newPathOriginal[500];
                 char newPathDestiny[500];
