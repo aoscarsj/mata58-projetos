@@ -196,7 +196,7 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
 
     // rotina de encerramento, fechando os arquivos
     if (close(arquivoDestino) < 0){
-        return -erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
+        return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
     }
     if (close(arquivoOrigem) < 0){
         return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
