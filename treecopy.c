@@ -13,16 +13,19 @@ int createDir(char *path);
 unsigned long long totalBytes = 0;
 unsigned int totalFiles = 0, totalDirs = 0;
 
-
+/*
+    Função utilizada para realizar a copia recursiva do diretorio selecionado para outro
+*/
 int treeCopy(char *originalPath, char *destinyPath){
     DIR *origem = opendir(originalPath);
-    
+    /*
+    * 
+    */
     if(origem){
         // abriu o diretório de origem
 
 
         struct dirent *child = readdir(origem);
-        // printf("Path: %s\n", originalPath);
         while( child != NULL){
             
             // enquanto o diretório tiver arquivo ou pasta, continue executando.
