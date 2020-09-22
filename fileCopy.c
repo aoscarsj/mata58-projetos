@@ -1,6 +1,6 @@
 /*Esse programa pode ser executado após compilado da seguinte forma:
 
-fileCopy arquivoOrigem arquivoDestino
+filecopy arquivoOrigem arquivoDestino
 
 O programa tentará criar uma cópia idêntica de arquivoOrigem com o nome
 arquivoDestino. Esse arquivo criado terá permissões 777.

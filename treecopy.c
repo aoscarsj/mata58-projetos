@@ -1,3 +1,21 @@
+/*Esse programa pode ser executado após compilado da seguinte forma:
+
+treecopy <diretorioorigem> <diretoriodestino>
+
+O programa tentará criar uma cópia idêntica do diretório <diretorioorigem> com o
+nome <diretoriodestino>. Esse diretório criado terá permissões 777.
+
+O programa pode falhar por diversos motivos, em alguns casos nada sendo
+copiado e em outros a cópia irá falhar no meio da execução.
+
+Após completar a cópia, o programa imprime em stdout uma mensagem contendo
+o nome do <diretorioorigem>, o nome de <diretoriodestino>, a quantidade de
+diretórios copiados, de arquivos copiados e a quantidade de bytes total.
+
+Retorna 0 se a cópia foi executada perfeitamente, ou -1 caso
+algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
+*/
+
 #include <errno.h>
 #include <linux/limits.h>
 #include <stdio.h>
