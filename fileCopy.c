@@ -237,9 +237,8 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
         if (close(arquivoOrigem) < 0){
             return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
         }
-
-        return 0;
     }
+    return 0;
 }
 
 int main(int argc, char const *argv[]){
