@@ -176,39 +176,37 @@ int treeCopy(char *originalPath, char *destinyPath){
     */
     DIR *origem = opendir(originalPath);
     if(origem){
-        // abriu o diretório de origem
-
-
         struct dirent *child = readdir(origem);
         while( child != NULL){
-
-            // enquanto o diretório tiver arquivo ou pasta, continue executando.
-
-                char newPathOriginal[PATH_MAX];
-                char newPathDestiny[PATH_MAX];
-                strcpy(newPathOriginal, originalPath);
-                strcat(newPathOriginal, "/");
-                strcat(newPathOriginal, child->d_name);
+            // o loop percorre todo o conteúdo do diretório até readdir(origem)
+            // retornar NULL
 
 
-                strcpy(newPathDestiny, destinyPath);
-                strcat(newPathDestiny, "/");
-                strcat(newPathDestiny, child->d_name);
+            char newPathOriginal[PATH_MAX];
+            char newPathDestiny[PATH_MAX];
+            strcpy(newPathOriginal, originalPath);
+            strcat(newPathOriginal, "/");
+            strcat(newPathOriginal, child->d_name);
 
-            if(child->d_type == FILE){
-                totalFiles++;
-                totalBytes += fileCopy(newPathOriginal, newPathDestiny);
-            }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..")  != 0){
-                totalDirs++;
-                //Não pode ser um arquivo nem a pasta . e nem a pasta ..
-                if(mkdir(newPathDestiny,MAXFILEPERMS)){
-                    errorDirCopy(NULL,newPathOriginal,newPathDestiny,WHILE_MAKING_DIR);
 
-                }
+            strcpy(newPathDestiny, destinyPath);
+            strcat(newPathDestiny, "/");
+            strcat(newPathDestiny, child->d_name);
 
-                treeCopy(newPathOriginal, newPathDestiny);
+        if(child->d_type == FILE){
+            totalFiles++;
+            totalBytes += fileCopy(newPathOriginal, newPathDestiny);
+        }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..")  != 0){
+            totalDirs++;
+            //Não pode ser um arquivo nem a pasta . e nem a pasta ..
+            if(mkdir(newPathDestiny,MAXFILEPERMS)){
+                errorDirCopy(NULL,newPathOriginal,newPathDestiny,WHILE_MAKING_DIR);
+
             }
-            child = readdir(origem);
+
+            treeCopy(newPathOriginal, newPathDestiny);
+        }
+        child = readdir(origem);
         }
         if (errno == EBADF) {
                 errorDirCopy(origem,originalPath,destinyPath,WHILE_READING_DIR);
