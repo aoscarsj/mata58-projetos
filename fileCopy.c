@@ -211,13 +211,17 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     int nBytesEscritos;
     // loop que realiza a escrita e a contagem dos bytes escritos
     while (nBytesLidos = read(arquivoOrigem, buffer, sizeof buffer), nBytesLidos > 0){
-        while ((nBytesEscritos = write(arquivoDestino, buffer, nBytesLidos)) == 0 && errno == EINTR);
-        // tenta ler várias vezes caso o erro seja EINTR
 
-        if (errno != EINTR || nBytesEscritos != nBytesLidos)
-            return erro(arquivoOrigem, arquivoDestino, nomeOriginal, nomeCopia);
+        nBytesEscritos = write(arquivoDestino, buffer, nBytesLidos);
+        // nem sempre serã lido um buffer inteiro (caso alcance o fim do arquivo)
+
+        if (nBytesEscritos >= 0){
+            nBytesEscritosTotal += nBytesEscritos;
+        }else if (errno != EINTR){
             // ignora o erro EINTR, pois a leitura pode ser tentada novamente
             // sem perdas
+            return erro(arquivoOrigem, arquivoDestino, nomeOriginal, nomeCopia);
+        }
 
 
     }
@@ -234,10 +238,7 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
             return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
         }
 
-        if (nBytesLidos == 0)
-            return 0;
-
-        return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
+        return 0;
     }
 }
 

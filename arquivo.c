@@ -184,8 +184,9 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     while (nBytesLidos = read(arquivoOrigem, buffer, sizeof buffer), nBytesLidos > 0){
         while ((nBytesEscritos = write(arquivoDestino, buffer, nBytesLidos)) == 0 && errno == EINTR);
         // tenta ler várias vezes caso o erro seja EINTR
-
-        if (errno != EINTR && nBytesEscritos != nBytesLidos){
+        if (nBytesEscritos >= 0)
+           nBytesEscritosTotal += nBytesEscritos;
+        else if (errno != EINTR && nBytesEscritos != nBytesLidos){
             return erro(arquivoOrigem, arquivoDestino, nomeOriginal, nomeCopia);
             // ignora o erro EINTR, pois a leitura pode ser tentada novamente
             // sem perdas
