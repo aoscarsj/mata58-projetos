@@ -16,15 +16,13 @@ enum points_of_error{UNKNOWN,WHILE_ENTERING_MAIN,WHILE_MAKING_DIR,
                      WHILE_OPENING_DIR,WHILE_READING_DIR};
 // int errorDirCopy(int dirOrigin, int dirDestiny,
 //          char const * nomeDirOrigem, char const * nomeDirDestino);
-int errorDirCopy(DIR * dirOrigin,
-                 char * dirOriginPath, char * dirDestinyPath, enum points_of_error PoE);
-int errorFileCopy();
 unsigned long long totalBytes = 0;
 unsigned int totalFiles = 0, totalDirs = 0;
+
+
+int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
+                 char * dirDestinyPath, enum points_of_error PoE);
 int treeCopy(char *originalPath, char *destinyPath);
-/*
-    Função utilizada para realizar a copia recursiva do diretorio selecionado para outro
-*/
 
 int main(int argc, char *argv[]){
     if (argc != 3){
@@ -43,68 +41,12 @@ int main(int argc, char *argv[]){
     }else{
         errorDirCopy(NULL,pastaOrigem,pastaDestino,WHILE_MAKING_DIR);
     }
+
     return 0;
-}
-// int errorDirCopy(int dirOrigin, int dirDestiny,
-//          char const * nomeDirOrigem, char const * nomeDirDestino);
-int treeCopy(char *originalPath, char *destinyPath){
-    /*
-    *
-    */
-    DIR *origem = opendir(originalPath);
-    if(origem){
-        // abriu o diretório de origem
-
-
-        struct dirent *child = readdir(origem);
-        while( child != NULL){
-
-            // enquanto o diretório tiver arquivo ou pasta, continue executando.
-
-                char newPathOriginal[PATH_MAX];
-                char newPathDestiny[PATH_MAX];
-                strcpy(newPathOriginal, originalPath);
-                strcat(newPathOriginal, "/");
-                strcat(newPathOriginal, child->d_name);
-
-
-                strcpy(newPathDestiny, destinyPath);
-                strcat(newPathDestiny, "/");
-                strcat(newPathDestiny, child->d_name);
-
-            if(child->d_type == FILE){
-                totalFiles++;
-                totalBytes += fileCopy(newPathOriginal, newPathDestiny);
-            }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..")  != 0){
-                totalDirs++;
-                //Não pode ser um arquivo nem a pasta . e nem a pasta ..
-                if(mkdir(newPathDestiny,MAXFILEPERMS))
-                    errorDirCopy(NULL,newPathOriginal,newPathDestiny,WHILE_MAKING_DIR);
-
-                treeCopy(newPathOriginal, newPathDestiny);
-            }
-            child = readdir(origem);
-        }
-        if (errno == EBADF)
-            errorDirCopy(origem,originalPath,destinyPath,WHILE_READING_DIR);
-    }else{
-        errorDirCopy(NULL,originalPath,destinyPath,WHILE_OPENING_DIR);
-    }
-
-    return 1;
 }
 
 int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
-                 char * dirDestinyPath, enum points_of_error PoE) {
-
-/*
-    A função "error" recebe as informações sobre o estado das variáveis re-
-    ferentes aos arquivos, avalia o valor da variável global errno e imprime
-    uma mensagem de error adequada, fechando os file descriptors e encerrando
-    o programa se necessário.
-*/
-// enum points_of_error{UNKNOWN,WHILE_ENTERING_MAIN,WHILE_MAKING_DIR,
-//                      WHILE_OPENING_DIR,WHILE_READING_DIR};
+                 char * dirDestinyPath, enum points_of_error PoE){
     switch (PoE) {
         case WHILE_MAKING_DIR:
             printf("Não foi possível criar o diretório %s",dirDestinyPath);
@@ -205,11 +147,59 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
             printf("\n");
             break;
     }
-//
     printf("O programa será encerrado.\n");
     if (dirOrigin != NULL) {
         closedir(dirOrigin);
     }
-
     return -1;
+}
+
+int treeCopy(char *originalPath, char *destinyPath){
+    /*
+    *
+    */
+    DIR *origem = opendir(originalPath);
+    if(origem){
+        // abriu o diretório de origem
+
+
+        struct dirent *child = readdir(origem);
+        while( child != NULL){
+
+            // enquanto o diretório tiver arquivo ou pasta, continue executando.
+
+                char newPathOriginal[PATH_MAX];
+                char newPathDestiny[PATH_MAX];
+                strcpy(newPathOriginal, originalPath);
+                strcat(newPathOriginal, "/");
+                strcat(newPathOriginal, child->d_name);
+
+
+                strcpy(newPathDestiny, destinyPath);
+                strcat(newPathDestiny, "/");
+                strcat(newPathDestiny, child->d_name);
+
+            if(child->d_type == FILE){
+                totalFiles++;
+                totalBytes += fileCopy(newPathOriginal, newPathDestiny);
+            }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..")  != 0){
+                totalDirs++;
+                //Não pode ser um arquivo nem a pasta . e nem a pasta ..
+                if(mkdir(newPathDestiny,MAXFILEPERMS)){
+                    errorDirCopy(NULL,newPathOriginal,newPathDestiny,WHILE_MAKING_DIR);
+
+                }
+
+                treeCopy(newPathOriginal, newPathDestiny);
+            }
+            child = readdir(origem);
+        }
+        if (errno == EBADF) {
+                errorDirCopy(origem,originalPath,destinyPath,WHILE_READING_DIR);
+        }
+    }else{
+        errorDirCopy(NULL,originalPath,destinyPath,WHILE_OPENING_DIR);
+    }
+
+    return 0;
 }
