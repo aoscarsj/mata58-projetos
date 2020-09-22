@@ -18,6 +18,8 @@ int erro(int arquivoOrigem, int arquivoDestino,
         uma mensagem de erro adequada, fechando os file descriptors e encerrando
         o programa se necessário. Alguns erros são apenas notificados, mas não
         causam encerramento do programa.
+
+        Sempre retorna -1.
     */
 
     bool erroFatal = true;
