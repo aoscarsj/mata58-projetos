@@ -1,3 +1,26 @@
+/*Esse programa pode ser executado após compilado da seguinte forma:
+
+fileCopy arquivoOrigem arquivoDestino
+
+O programa tentará criar uma cópia idêntica de arquivoOrigem com o nome
+arquivoDestino. Esse arquivo criado terá permissões 777.
+
+No processo de cópia, um buffer de 4096 bytes é utilizado, garantindo
+baixo uso de memória pelo programa. Embora haja uma chamada de sistema
+[sendfile()] que execute essa operação, esse programa tem a vantagem de
+melhor sinalização e manipulação de erros.
+
+O programa pode falhar por diversos motivos, em alguns casos nada sendo
+copiado e em outros a cópia irá falhar no meio da execução.
+
+Após completar a cópia, o programa imprime em stdout uma mensagem contendo
+o nome do arquivoOrigem, o nome de arquivoDestino e o número de bytes co-
+piados.
+
+Retorna 0 se a cópia foi executada perfeitamente, ou -1 caso
+algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
+*/
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
