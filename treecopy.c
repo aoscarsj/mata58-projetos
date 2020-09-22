@@ -77,10 +77,9 @@ int treeCopy(char *originalPath, char *destinyPath){
                 totalBytes += fileCopy(newPathOriginal, newPathDestiny);
             }else if(strcmp(child->d_name, ".") !=0 && strcmp(child->d_name, "..")  != 0){
                 totalDirs++;
-                printf("\n\n%s\n\n",newPathDestiny );
                 //Não pode ser um arquivo nem a pasta . e nem a pasta ..
-                if(!mkdir(newPathDestiny,MAXFILEPERMS))
-                    errorDirCopy(NULL,originalPath,destinyPath,WHILE_MAKING_DIR);
+                if(mkdir(newPathDestiny,MAXFILEPERMS))
+                    errorDirCopy(NULL,newPathOriginal,newPathDestiny,WHILE_MAKING_DIR);
 
                 treeCopy(newPathOriginal, newPathDestiny);
             }
