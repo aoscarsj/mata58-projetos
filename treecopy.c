@@ -86,7 +86,7 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
         case NOT_FILE_OR_DIR:
             printf("Não foi possível copiar o arquivo/diretório %s", dirOriginPath);
             break;
-            
+
         default:
             printf("Um erro ocorreu");
             break;
@@ -207,7 +207,7 @@ int treeCopy(char *originalPath, char *copyPath){
             char newPathOriginal[PATH_MAX];
             char newPathCopy[PATH_MAX];
 
-            //constró o caminho do arquivo/diretório filho
+            //constrói o caminho do arquivo/diretório filho
             strcpy(newPathOriginal, originalPath);
             strcat(newPathOriginal, "/");
             strcat(newPathOriginal, child->d_name);
