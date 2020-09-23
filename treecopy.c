@@ -24,7 +24,6 @@ algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include <dirent.h>
 #include "arquivo.c"
 
 #define DT_REG 8
@@ -36,7 +35,7 @@ algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
 enum points_of_error{UNKNOWN,WHILE_ENTERING_MAIN,WHILE_MAKING_DIR,
                      WHILE_OPENING_DIR,WHILE_READING_DIR,NOT_FILE_OR_DIR};
 // sinaliza para a função errorDirCopy em que situação ocorreu o erro
-                     
+
 unsigned long long totalBytes = 0;
 unsigned int totalFiles = 0, totalDirs = 0;
 
@@ -183,7 +182,7 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
 
 int treeCopy(char *originalPath, char *copyPath){
     /*
-    *  A função trecopy recursivamente cria uma copia do diretorio de nome
+    *  A função treecopy recursivamente cria uma copia do diretorio de nome
     * no argumento originalPath com o nome copyPath. Caso o diretório contenha
     * algo que não é arquivo ou diretório comum, a operação é abortada.
     *
@@ -233,6 +232,7 @@ int treeCopy(char *originalPath, char *copyPath){
                         return -1;
                 }else{
                     // nem arquivo nem diretório (não pode copiar)
+                    errno = ENOTFILEORDIR;
                     return errorDirCopy(origem,originalPath,copyPath,NOT_FILE_OR_DIR);
                 }
 

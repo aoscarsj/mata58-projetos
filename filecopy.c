@@ -28,6 +28,7 @@ algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
 #include <fcntl.h>
 
 #define ENOTENOUGHARGS 255
+#define MAXFILEPERMS 0777
 
 typedef enum{false,true} bool;
 
@@ -199,13 +200,10 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
     em octal. 0777 é o maior nível de permissão, onde tanto o usuário, usuários
     do mesmo grupo e quaisquer outros podem ler, escrever e executar o arquivo.
     */
-    if((arquivoDestino = open(nomeCopia, O_WRONLY | O_CREAT | O_EXCL, 0777)) == -1){
+    if((arquivoDestino = open(nomeCopia, O_WRONLY | O_CREAT | O_EXCL, MAXFILEPERMS)) == -1){
         return erro(arquivoOrigem, arquivoDestino,nomeOriginal,nomeCopia);
     }
 
-
-    // é criado um ponteiro auxiliar para que não se passe buffer diretamente
-    // para a função write()
 
     int nBytesLidos = 0;
     int nBytesEscritos;
