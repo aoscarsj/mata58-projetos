@@ -27,18 +27,20 @@ algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
 #include <dirent.h>
 #include "arquivo.c"
 
-#define FILE 8
+#define DT_REG 8
+#define DT_DIR 4
+#define ENOTFILEORDIR 254
 #define ENOTENOUGHARGS 255
 #define MAXFILEPERMS 0777
 enum points_of_error{UNKNOWN,WHILE_ENTERING_MAIN,WHILE_MAKING_DIR,
-                     WHILE_OPENING_DIR,WHILE_READING_DIR};
+                     WHILE_OPENING_DIR,WHILE_READING_DIR,NOT_FILE_OR_DIR};
 unsigned long long totalBytes = 0;
 unsigned int totalFiles = 0, totalDirs = 0;
 
 
 int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
-                 char * dirDestinyPath, enum points_of_error PoE);
-int treeCopy(char *originalPath, char *destinyPath);
+                 char * dirCopyPath, enum points_of_error PoE);
+int treeCopy(char *originalPath, char *copyPath);
 
 int main(int argc, char *argv[]){
     int returnvalue = 0;
@@ -64,10 +66,10 @@ int main(int argc, char *argv[]){
 }
 
 int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
-                 char * dirDestinyPath, enum points_of_error PoE){
+                 char * dirCopyPath, enum points_of_error PoE){
     switch (PoE) { // Prefixo que indica onde o erro ocorreu
         case WHILE_MAKING_DIR:
-            printf("Não foi possível criar o diretório %s",dirDestinyPath);
+            printf("Não foi possível criar o diretório %s",dirCopyPath);
             break;
         case WHILE_OPENING_DIR:
             printf("Não foi possível abrir o diretório %s",dirOriginPath);
@@ -75,12 +77,16 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
         case WHILE_READING_DIR:
             printf("Não foi possível ler o diretório %s", dirOriginPath);
             break;
+        case NOT_FILE_OR_DIR:
+            printf("Não foi possível copiar o arquivo/diretório %s", dirOriginPath);
         default:
             printf("Um erro ocorreu");
             break;
     }
 
     switch (errno) { // sufixo que indica qual foi o tipo de erro
+        case ENOTFILEORDIR:
+            printf(": não é um arquivo ou diretório.\n");
         case EPERM:
             printf(": operação não permitida ao usuário.\n");
             break;
@@ -172,10 +178,15 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
     return -1;
 }
 
-int treeCopy(char *originalPath, char *destinyPath){
+int treeCopy(char *originalPath, char *copyPath){
     /*
+    *  A função trecopy recursivamente cria uma copia do diretorio de nome
+    * no argumento originalPath com o nome copyPath.
     *
+    * Retorna 0 caso a cópia tenha sido um sucesso, e -1 se ocorreu algum erro
+    * que impediu a conclusão da cópia.
     */
+
     DIR *origem = opendir(originalPath);
     if(origem){
         struct dirent *child = readdir(origem);
@@ -185,45 +196,53 @@ int treeCopy(char *originalPath, char *destinyPath){
 
 
             char newPathOriginal[PATH_MAX];
-            char newPathDestiny[PATH_MAX];
+            char newPathCopy[PATH_MAX];
 
             strcpy(newPathOriginal, originalPath);
             strcat(newPathOriginal, "/");
             strcat(newPathOriginal, child->d_name);
 
 
-            strcpy(newPathDestiny, destinyPath);
-            strcat(newPathDestiny, "/");
-            strcat(newPathDestiny, child->d_name);
+            strcpy(newPathCopy, copyPath);
+            strcat(newPathCopy, "/");
+            strcat(newPathCopy, child->d_name);
 
-            if(child->d_type == FILE){
-                totalFiles++;
-                int copiedBytes = fileCopy(newPathOriginal, newPathDestiny);
-                if (copiedBytes == -1) {
-                    return -1;
-                }else{
-                    totalBytes += copiedBytes;
-                }
-            }else if(strcmp(child->d_name, ".") && strcmp(child->d_name, "..")){
+            if (strcmp(child->d_name, ".") && strcmp(child->d_name, "..")){
                 // filtra os diretórios relativos . e ..
-                if(mkdir(newPathDestiny,MAXFILEPERMS)){
-                    return errorDirCopy(NULL,newPathOriginal,newPathDestiny,WHILE_MAKING_DIR);
-
+                if(child->d_type == DT_REG){
+                    // DT_REG -> arquivo
+                    totalFiles++;
+                    int copiedBytes = fileCopy(newPathOriginal, newPathCopy);
+                    if (copiedBytes == -1) {
+                        return -1;
+                    }else{
+                        totalBytes += copiedBytes;
+                    }
+                }else if(child->d_type == DT_DIR){
+                    // DT_DIR -> diretório
+                    if(mkdir(newPathCopy,MAXFILEPERMS)){
+                        return errorDirCopy(NULL,newPathOriginal,newPathCopy,WHILE_MAKING_DIR);
+                    }
+                    int successful = treeCopy(newPathOriginal, newPathCopy);
+                    totalDirs++;
+                    if (!successful)
+                        return -1;
+                }else{
+                    // nem arquivo nem diretório (não pode copiar)
+                    return errorDirCopy(origem,originalPath,copyPath,NOT_FILE_OR_DIR);
                 }
 
-                int successful = treeCopy(newPathOriginal, newPathDestiny);
-                if (!successful)
-                    return -1;
-                totalDirs++;
             }
             child = readdir(origem);
         }
         if (errno == EBADF) {
-            return errorDirCopy(origem,originalPath,destinyPath,WHILE_READING_DIR);
+            return errorDirCopy(origem,originalPath,copyPath,WHILE_READING_DIR);
         }
     }else{
-        return errorDirCopy(NULL,originalPath,destinyPath,WHILE_OPENING_DIR);
+        return errorDirCopy(NULL,originalPath,copyPath,WHILE_OPENING_DIR);
     }
+
+    closedir(origem);
 
     return 0;
 }
