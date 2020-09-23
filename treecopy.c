@@ -70,17 +70,23 @@ int main(int argc, char *argv[]){
 int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
                  char * dirCopyPath, enum points_of_error PoE){
     switch (PoE) { // Prefixo que indica onde o erro ocorreu
+
         case WHILE_MAKING_DIR:
             printf("Não foi possível criar o diretório %s",dirCopyPath);
             break;
+
         case WHILE_OPENING_DIR:
             printf("Não foi possível abrir o diretório %s",dirOriginPath);
             break;
+
         case WHILE_READING_DIR:
             printf("Não foi possível ler o diretório %s", dirOriginPath);
             break;
+
         case NOT_FILE_OR_DIR:
             printf("Não foi possível copiar o arquivo/diretório %s", dirOriginPath);
+            break;
+            
         default:
             printf("Um erro ocorreu");
             break;
@@ -193,7 +199,7 @@ int treeCopy(char *originalPath, char *copyPath){
     DIR *origem = opendir(originalPath);
     if(origem){
         struct dirent *child = readdir(origem);
-        while( child != NULL){
+        while(child != NULL){
             // o loop percorre todo o conteúdo do diretório até que
             // readdir(origem) retorne NULL
 
