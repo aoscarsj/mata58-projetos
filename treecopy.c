@@ -181,7 +181,8 @@ int errorDirCopy(DIR * dirOrigin, char * dirOriginPath,
 int treeCopy(char *originalPath, char *copyPath){
     /*
     *  A função trecopy recursivamente cria uma copia do diretorio de nome
-    * no argumento originalPath com o nome copyPath.
+    * no argumento originalPath com o nome copyPath. Caso o diretório contenha
+    * algo que não é arquivo ou diretório comum, a operação é abortada.
     *
     * Retorna 0 caso a cópia tenha sido um sucesso, e -1 se ocorreu algum erro
     * que impediu a conclusão da cópia.
