@@ -215,9 +215,7 @@ int fileCopy(const char * nomeOriginal, const char * nomeCopia){
 
         if (nBytesEscritos >= 0){
             nBytesEscritosTotal += nBytesEscritos;
-        }else if (errno != EINTR){
-            // ignora o erro EINTR, pois a leitura pode ser tentada novamente
-            // sem perdas
+        }else{
             return erro(arquivoOrigem, arquivoDestino, nomeOriginal, nomeCopia);
         }
 
