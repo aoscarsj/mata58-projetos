@@ -207,6 +207,7 @@ int treeCopy(char *originalPath, char *copyPath){
             char newPathOriginal[PATH_MAX];
             char newPathCopy[PATH_MAX];
 
+            //constró o caminho do arquivo/diretório filho
             strcpy(newPathOriginal, originalPath);
             strcat(newPathOriginal, "/");
             strcat(newPathOriginal, child->d_name);
