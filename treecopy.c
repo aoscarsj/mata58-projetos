@@ -32,8 +32,11 @@ algum erro fatal que impediu a conclusão da cópia tenha ocorrido.
 #define ENOTFILEORDIR 254
 #define ENOTENOUGHARGS 255
 #define MAXFILEPERMS 0777
+
 enum points_of_error{UNKNOWN,WHILE_ENTERING_MAIN,WHILE_MAKING_DIR,
                      WHILE_OPENING_DIR,WHILE_READING_DIR,NOT_FILE_OR_DIR};
+// sinaliza para a função errorDirCopy em que situação ocorreu o erro
+                     
 unsigned long long totalBytes = 0;
 unsigned int totalFiles = 0, totalDirs = 0;
 
