@@ -237,6 +237,8 @@ int treeCopy(char *originalPath, char *copyPath){
             child = readdir(origem);
         }
         if (errno == EBADF) {
+            // caso readdir tenha retornado NULL por causa de um ponteiro DIR
+            // inadequado.
             return errorDirCopy(origem,originalPath,copyPath,WHILE_READING_DIR);
         }
     }else{
