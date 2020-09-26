@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 /* FUNÇÕES A SE IMPLEMENTAR
 start()
@@ -12,7 +14,7 @@ pwd()
 
 int main(int argc, char const *argv[]) {
     //  TODO:rotina de inicialização
-
+    
     /* TODO:  LOOP PRINCIPAL
         printf("myshell> "), fflush(stdout); // imprime e força a saída imediata na tela
         // ler entrada (pode ser vazio (apenas apertar enter), comandos, ou EOF) e extrair seu conteudo (separar palavras) com strtok
