@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
@@ -39,7 +40,7 @@ int main(int argc, char const *argv[]) {
             continue;
             // se for em branco: continue;
         }else{
-            erroEntrada(); // imprime mensagem de erro correspondente
+            // erroEntrada(); // imprime mensagem de erro correspondente
         }
     }
 
