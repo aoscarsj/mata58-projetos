@@ -3,8 +3,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/wait.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h> 
 
 #define MAX_CHARS 4096
+int QUIT = 0;
 /* FUNÇÕES A SE IMPLEMENTAR
 erroEntrada() // imprime mensagem de erro relacionada à entrada
 start()
@@ -16,6 +21,9 @@ chdir()
 pwd()
 */
 
+
+char *builtin_cmd[] = {"cd\n", "exit\n"};// comandos
+
 int main(int argc, char const *argv[]) {
     //  TODO:rotina de inicialização
     char raw_line[MAX_CHARS + 1]; // 4096 chars + null
@@ -23,6 +31,14 @@ int main(int argc, char const *argv[]) {
     while(true) {
         printf("myshell> "), fflush(stdout); // imprime e força a saída imediata na tela
         if(fgets(raw_line, sizeof raw_line ,stdin) && raw_line[0] != '\n'){
+
+
+        	if(strcmp(builtin_cmd[1],raw_line) == 0){
+        		return EXIT_SUCCESS;
+        	}
+        	
+
+        	
             /*
             ////
             se for comando, executar o comando com os argumentos passados
