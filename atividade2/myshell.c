@@ -78,9 +78,11 @@ int myShellIniciar (char **args){
 	else{
 		// processo pai
 	do {
-	/*A função wait suspende a execução do processo até a morte de seu filho. Se o filho já estiver morto no instante da chamada da primitiva (caso de um processo zumbi, abortado mais a frente), a função retorna imediatamente.
+	/*A função wait suspende a execução do processo até a morte de seu filho. Se o filho já estiver morto no instante da chamada da primitiva 
+	(caso de um processo zumbi, abortado mais a frente), a função retorna imediatamente.
 
-	A função waitpid suspende a execução do processo até que o filho especificado pelo argumento pid tenha morrido. Se ele já estiver morto no momento da chamada, o comportamento é idêntico ao descrito anteriormente.
+	A função waitpid suspende a execução do processo até que o filho especificado pelo argumento pid tenha morrido. Se ele já estiver morto no momento da chamada, 
+	o comportamento é idêntico ao descrito anteriormente.
 
 	O valor do argumento pid pode ser:
 
