@@ -90,7 +90,8 @@ int myShellIniciar (char **args){
 	-1 : significando que o pai espera a morte de qualquer filho;
 	0 : significando que o pai espera a morte de qualquer processo filho cujo ID do grupo é igual ao do processo chamado;
 	> 0 : significando que o pai espera a morte de um processo filho com um valor de ID exatamente igual a pid.
-	Se status é não nulo (NULL), wait e waitpid armazena a informação relativa a razão da morte do processo filho, sendo apontada pelo ponteiro status. Este valor pode ser avaliado com diversas macros que são listadas com o comando shell man 2 wait.*/
+	Se status é não nulo (NULL), wait e waitpid armazena a informação relativa a razão da morte do processo filho, 
+	sendo apontada pelo ponteiro status. Este valor pode ser avaliado com diversas macros que são listadas com o comando shell man 2 wait.*/
       wpid = waitpid(pid, &status, WUNTRACED);
     }
      while (!WIFEXITED(status) && !WIFSIGNALED(status));
