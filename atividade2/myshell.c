@@ -62,6 +62,10 @@ int myShellIniciar (char **args){
 	pid = fork();
 	if (pid == 0){
 		// processo filho
+		//As  funções  execv e execvp fornecem um vetor de ponteiros para strings terminadas em '\0'
+       		//que representam a lista de argumentos disponível ao novo programa.  O primeiro  argumento,
+       		//por  convenção,  deveria  apontar  para  o  nome  do  arquivo  associado  ao arquivo sendo
+       		//executado.  O vetor de ponteiros deve ser terminado por um ponteiro NULL .
 		if (execvp(args[0], args) == -1){
 			printf("myShell: comando desconhecido: %s\n", (*args));
 		}
@@ -74,6 +78,17 @@ int myShellIniciar (char **args){
 	else{
 		// processo pai
 	do {
+	/*A função wait suspende a execução do processo até a morte de seu filho. Se o filho já estiver morto no instante da chamada da primitiva (caso de um processo zumbi, abortado mais a frente), a função retorna imediatamente.
+
+	A função waitpid suspende a execução do processo até que o filho especificado pelo argumento pid tenha morrido. Se ele já estiver morto no momento da chamada, o comportamento é idêntico ao descrito anteriormente.
+
+	O valor do argumento pid pode ser:
+
+	< -1 : significando que o pai espera a morte de qualquer filho cujo o ID do grupo é igual so valor de pid;
+	-1 : significando que o pai espera a morte de qualquer filho;
+	0 : significando que o pai espera a morte de qualquer processo filho cujo ID do grupo é igual ao do processo chamado;
+	> 0 : significando que o pai espera a morte de um processo filho com um valor de ID exatamente igual a pid.
+	Se status é não nulo (NULL), wait e waitpid armazena a informação relativa a razão da morte do processo filho, sendo apontada pelo ponteiro status. Este valor pode ser avaliado com diversas macros que são listadas com o comando shell man 2 wait.*/
       wpid = waitpid(pid, &status, WUNTRACED);
     }
      while (!WIFEXITED(status) && !WIFSIGNALED(status));
